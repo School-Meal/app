@@ -3,7 +3,6 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:school_meal/screen/auth/signin_screen.dart';
 
 class MealScreen extends StatefulWidget {
@@ -60,7 +59,7 @@ class _MealScreenState extends State<MealScreen> {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       setState(() {
-        meals = responseData['meals'];
+        meals = responseData['meals'] ?? [];
         isLoading = false;
       });
     } else {
@@ -100,17 +99,17 @@ class _MealScreenState extends State<MealScreen> {
           ? const Center(child: CircularProgressIndicator())
           : meals.isEmpty
               ? const Center(child: Text("No meal data available"))
-              : CarouselSlider(
-                  options: CarouselOptions(height: 400.0),
-                  items: meals.map((meal) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return SizedBox(
-                          width: 500,
-                          height: 500,
+              : Center(
+                  child: SizedBox(
+                    width: 500,
+                    height: 500,
+                    child: PageView.builder(
+                      itemCount: meals.length,
+                      itemBuilder: (context, index) {
+                        final meal = meals[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(10.0),
                           child: Card(
-                            margin:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -128,8 +127,8 @@ class _MealScreenState extends State<MealScreen> {
                           ),
                         );
                       },
-                    );
-                  }).toList(),
+                    ),
+                  ),
                 ),
     );
   }
