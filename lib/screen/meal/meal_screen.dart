@@ -47,7 +47,7 @@ class _MealScreenState extends State<MealScreen> {
       return;
     }
 
-    final url = Uri.parse('http://3.38.149.135/meal');
+    final url = Uri.parse('http://52.78.20.150/meal');
     final response = await http.get(
       url,
       headers: {

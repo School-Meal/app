@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_meal/screen/auth/signup_screen.dart';
 import 'package:school_meal/screen/meal/meal_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      final url = Uri.parse('http://3.38.149.135/auth/signin');
+      final url = Uri.parse('http://52.78.20.150/auth/signin');
       try {
         final response = await http.post(
           url,
@@ -122,6 +123,22 @@ class _SignInScreenState extends State<SignInScreen> {
               ElevatedButton(
                 onPressed: _login,
                 child: Text('로그인하기'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignUpScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  '계정이 없으신가요? 회원가입',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
