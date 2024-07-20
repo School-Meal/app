@@ -68,9 +68,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.network(
+                  "https://school-meal-s3-images.s3.ap-northeast-2.amazonaws.com/gbswhs.png"),
               TextFormField(
                 controller: _nicknameController,
-                decoration: InputDecoration(labelText: '닉네임'),
+                decoration: const InputDecoration(labelText: '시바디자인해줘'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '닉네임을 입력해주세요!';
@@ -80,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               TextFormField(
                 controller: _schoolNameController,
-                decoration: InputDecoration(labelText: '학교 이름'),
+                decoration: const InputDecoration(labelText: '학교 이름'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '학교 이름을 입력해주세요';
@@ -90,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: '이메일'),
+                decoration: const InputDecoration(labelText: '이메일'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '이메일을 입력해주세요';
@@ -100,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: '비밀번호'),
+                decoration: const InputDecoration(labelText: '비밀번호'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {

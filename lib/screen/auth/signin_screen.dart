@@ -16,6 +16,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _schoolNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nicknameController = TextEditingController();
 
   Future<String> _getTokenPath() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -39,6 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
             'schoolName': _schoolNameController.text,
             'email': _emailController.text,
             'password': _passwordController.text,
+            'nickname': _nicknameController.text,
           }),
         );
 
@@ -94,6 +96,16 @@ class _SignInScreenState extends State<SignInScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '학교 이름을 입력해주세요';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _nicknameController,
+                decoration: InputDecoration(labelText: '닉네임'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '닉네임을 입력해주세요';
                   }
                   return null;
                 },
