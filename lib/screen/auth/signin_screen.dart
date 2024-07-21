@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -37,10 +39,8 @@ class _SignInScreenState extends State<SignInScreen> {
           url,
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
-            'schoolName': _schoolNameController.text,
             'email': _emailController.text,
             'password': _passwordController.text,
-            'nickname': _nicknameController.text,
           }),
         );
 
@@ -90,26 +90,6 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFormField(
-                controller: _schoolNameController,
-                decoration: InputDecoration(labelText: '학교 이름'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '학교 이름을 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _nicknameController,
-                decoration: InputDecoration(labelText: '닉네임'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '닉네임을 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(labelText: '이메일'),
