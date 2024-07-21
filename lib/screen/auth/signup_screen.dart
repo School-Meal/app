@@ -68,11 +68,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.network(
-                  "https://school-meal-s3-images.s3.ap-northeast-2.amazonaws.com/gbswhs.png"),
               TextFormField(
                 controller: _nicknameController,
-                decoration: const InputDecoration(labelText: '시바디자인해줘'),
+                decoration: const InputDecoration(labelText: '닉네임'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '닉네임을 입력해주세요!';
