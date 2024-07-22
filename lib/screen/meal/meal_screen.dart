@@ -100,7 +100,7 @@ class _MealScreenState extends State<MealScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : meals.isEmpty
-              ? const Center(child: Text("No meal data available"))
+              ? const Center(child: Text("급식데이터 없음"))
               : Center(
                   child: SizedBox(
                     width: 500,

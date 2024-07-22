@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_meal/screen/profile/edit_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -66,11 +67,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('프로필')),
+      appBar: AppBar(
+        title: const Text('프로필'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditProfile()),
+              );
+            },
+            icon: Icon(Icons.edit),
+          ),
+        ],
+      ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : userProfile == null
-              ? Center(child: Text('Failed to load profile'))
+              ? const Center(child: Text('Failed to load profile'))
               : Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -95,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        '닉네임: ${userProfile!['nickname']}',
+                        '닉네임: ${userProfile!['nickName']}',
                         style: TextStyle(fontSize: 18),
                       ),
                     ],

@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_meal/screen/auth/signup_screen.dart';
 import 'package:school_meal/screen/meal/meal_screen.dart';
+import 'package:school_meal/screen/navigator.dart';
+import 'package:school_meal/screen/profile/profile_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -15,10 +17,8 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _schoolNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _nicknameController = TextEditingController();
 
   Future<String> _getTokenPath() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -49,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
           if (responseData['accessToken'] != null) {
             await _saveToken(responseData['accessToken']);
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const MealScreen()),
+              MaterialPageRoute(builder: (context) => const MainNavigator()),
             );
           } else {
             _showErrorDialog('로그인 실패: 토큰을 받지 못했습니다.');
@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: '이메일'),
+                decoration: const InputDecoration(labelText: '이메일'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '이메일을 입력해주세요';
@@ -102,7 +102,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: '비밀번호'),
+                decoration: const InputDecoration(labelText: '비밀번호'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -111,10 +111,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _login,
-                child: Text('로그인하기'),
+                child: const Text('로그인하기'),
               ),
               TextButton(
                 onPressed: () {

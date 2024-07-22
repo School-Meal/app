@@ -27,6 +27,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'schoolName': _schoolNameController.text,
             'email': _emailController.text,
             'password': _passwordController.text,
+            'nickname': _nicknameController.text,
           }),
         );
 

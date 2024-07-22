@@ -5,6 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:school_meal/screen/auth/signin_screen.dart';
 import 'package:school_meal/screen/meal/meal_screen.dart';
+import 'package:school_meal/screen/navigator.dart';
+import 'package:school_meal/screen/profile/profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,13 +43,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (accessToken != null) {
       await Future.delayed(const Duration(seconds: 3), () {});
-      // Token exists, navigate to MealScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MealScreen()),
+        MaterialPageRoute(builder: (context) => const MainNavigator()),
       );
     } else {
-      // No token, navigate to SignInScreen
       await Future.delayed(const Duration(seconds: 3), () {});
       Navigator.pushReplacement(
         context,
