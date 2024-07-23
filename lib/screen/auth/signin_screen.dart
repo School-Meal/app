@@ -4,9 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_meal/screen/auth/signup_screen.dart';
-import 'package:school_meal/screen/meal/meal_screen.dart';
 import 'package:school_meal/screen/navigator.dart';
-import 'package:school_meal/screen/profile/profile_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   @override

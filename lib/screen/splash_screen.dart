@@ -1,12 +1,8 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:school_meal/screen/auth/signin_screen.dart';
-import 'package:school_meal/screen/meal/meal_screen.dart';
 import 'package:school_meal/screen/navigator.dart';
-import 'package:school_meal/screen/profile/profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
