@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -49,7 +50,7 @@ class _MealScreenState extends State<MealScreen> {
       return;
     }
 
-    final url = Uri.parse('http://52.78.20.150/meal');
+    final url = Uri.parse('${dotenv.env['API_URL']}/meal');
     final response = await http.get(
       url,
       headers: {

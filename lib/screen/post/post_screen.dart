@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -22,7 +23,7 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Future<void> _fetchPosts() async {
-    final url = Uri.parse('http://52.78.20.150/post');
+    final url = Uri.parse('${dotenv.env['API_URL']}/post');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

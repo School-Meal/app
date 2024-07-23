@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -49,7 +50,7 @@ class _EditProfileState extends State<EditProfile> {
     String? token = await _readToken();
     if (token == null) return;
 
-    final url = Uri.parse('http://52.78.20.150/auth/me');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
     var request = http.MultipartRequest('PATCH', url)
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['schoolName'] = _schoolNameController.text

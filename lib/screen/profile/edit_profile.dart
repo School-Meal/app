@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -42,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetchUserProfile() async {
     String? token = await _readToken();
 
-    final url = Uri.parse('http://52.78.20.150/auth/me');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
     final response = await http.get(
       url,
       headers: {

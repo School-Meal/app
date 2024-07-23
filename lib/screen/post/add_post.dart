@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -50,7 +51,7 @@ class _AddPostState extends State<AddPost> {
 
   Future<void> _submitPost() async {
     if (_formKey.currentState!.validate() && _token != null) {
-      final url = Uri.parse('http://52.78.20.150/post/');
+      final url = Uri.parse('${dotenv.env['API_URL']}/post/');
       var request = http.MultipartRequest('POST', url);
 
       // Add headers
