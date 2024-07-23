@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:school_meal/screen/post/add_post.dart';
+
 class PostScreen extends StatefulWidget {
   const PostScreen({super.key});
 
@@ -42,6 +44,15 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Posts'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => AddPost()));
+            },
+            icon: Icon(Icons.edit),
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
