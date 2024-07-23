@@ -2,31 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_meal/screen/profile/edit_profile.dart';
+import 'package:school_meal/screen/profile/profile_screen.dart';
 
-class EditProfile extends StatefulWidget {
-  final Map<String, dynamic>? userProfile;
-
-  const EditProfile({super.key, this.userProfile});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
-  _EditProfileState createState() => _EditProfileState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _EditProfileState extends State<EditProfile> {
-  final _formKey = GlobalKey<FormState>();
-  final _schoolNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _nicknameController = TextEditingController();
-  File? _image;
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? userProfile;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _schoolNameController.text = widget.userProfile?['schoolName'] ?? '';
-    _emailController.text = widget.userProfile?['email'] ?? '';
-    _nicknameController.text = widget.userProfile?['nickName'] ?? '';
+    _fetchUserProfile();
   }
 
   Future<String> _getTokenPath() async {
@@ -45,40 +39,28 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> _updateProfile() async {
+  Future<void> _fetchUserProfile() async {
     String? token = await _readToken();
-    if (token == null) return;
 
     final url = Uri.parse('http://52.78.20.150/auth/me');
-    var request = http.MultipartRequest('PATCH', url)
-      ..headers['Authorization'] = 'Bearer $token'
-      ..fields['schoolName'] = _schoolNameController.text
-      ..fields['email'] = _emailController.text
-      ..fields['nickName'] = _nicknameController.text;
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-    if (_image != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath('image', _image!.path),
-      );
-    }
-
-    final response = await request.send();
     if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final updatedProfile = json.decode(responseData);
-      Navigator.of(context).pop(updatedProfile);
+      setState(() {
+        userProfile = json.decode(response.body);
+        isLoading = false;
+      });
     } else {
       // Handle error
-      print('Error updating profile: ${response.statusCode}');
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+      print('Error fetching user profile: ${response.statusCode}');
       setState(() {
-        _image = File(pickedFile.path);
+        isLoading = false;
       });
     }
   }
@@ -87,64 +69,55 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('프로필'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _updateProfile();
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfile(userProfile: userProfile),
+                ),
+              );
             },
+            icon: Icon(Icons.edit),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _schoolNameController,
-                decoration: InputDecoration(labelText: 'School Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your school name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _nicknameController,
-                decoration: InputDecoration(labelText: 'Nickname'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your nickname';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: Text('Pick Image'),
-              ),
-              if (_image != null) Image.file(_image!),
-            ],
-          ),
-        ),
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : userProfile == null
+              ? const Center(child: Text('Failed to load profile'))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (userProfile!['imageUri'] != null &&
+                          userProfile!['imageUri'].isNotEmpty)
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage:
+                              NetworkImage(userProfile!['imageUri']),
+                        ),
+                      SizedBox(height: 20),
+                      Text(
+                        '학교 이름: ${userProfile!['schoolName']}',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        '이메일: ${userProfile!['email']}',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        '닉네임: ${userProfile!['nickName']}',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 }

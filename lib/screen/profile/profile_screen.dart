@@ -2,24 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:school_meal/screen/profile/edit_profile.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class EditProfile extends StatefulWidget {
+  final Map<String, dynamic>? userProfile;
+
+  const EditProfile({super.key, this.userProfile});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  _EditProfileState createState() => _EditProfileState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic>? userProfile;
-  bool isLoading = true;
+class _EditProfileState extends State<EditProfile> {
+  final _formKey = GlobalKey<FormState>();
+  final _schoolNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _nicknameController = TextEditingController();
+  File? _image;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile();
+    _schoolNameController.text = widget.userProfile?['schoolName'] ?? '';
+    _emailController.text = widget.userProfile?['email'] ?? '';
+    _nicknameController.text = widget.userProfile?['nickName'] ?? '';
   }
 
   Future<String> _getTokenPath() async {
@@ -38,28 +45,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _fetchUserProfile() async {
+  Future<void> _updateProfile() async {
     String? token = await _readToken();
+    if (token == null) return;
 
     final url = Uri.parse('http://52.78.20.150/auth/me');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    var request = http.MultipartRequest('PATCH', url)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..fields['schoolName'] = _schoolNameController.text
+      ..fields['email'] = _emailController.text
+      ..fields['nickName'] = _nicknameController.text;
 
+    if (_image != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('image', _image!.path),
+      );
+    }
+
+    final response = await request.send();
     if (response.statusCode == 200) {
-      setState(() {
-        userProfile = json.decode(response.body);
-        isLoading = false;
-      });
+      final responseData = await response.stream.bytesToString();
+      final updatedProfile = json.decode(responseData);
+      Navigator.of(context).pop(updatedProfile);
     } else {
       // Handle error
-      print('Error fetching user profile: ${response.statusCode}');
+      print('Error updating profile: ${response.statusCode}');
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        isLoading = false;
+        _image = File(pickedFile.path);
       });
     }
   }
@@ -68,53 +87,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('프로필'),
+        title: const Text('Edit Profile'),
         actions: [
           IconButton(
+            icon: Icon(Icons.save),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditProfile()),
-              );
+              if (_formKey.currentState!.validate()) {
+                _updateProfile();
+              }
             },
-            icon: Icon(Icons.edit),
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : userProfile == null
-              ? const Center(child: Text('Failed to load profile'))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (userProfile!['imageUri'] != null &&
-                          userProfile!['imageUri'].isNotEmpty)
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage:
-                              NetworkImage(userProfile!['imageUri']),
-                        ),
-                      SizedBox(height: 20),
-                      Text(
-                        '학교 이름: ${userProfile!['schoolName']}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '이메일: ${userProfile!['email']}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '닉네임: ${userProfile!['nickName']}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _schoolNameController,
+                decoration: InputDecoration(labelText: 'School Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your school name';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _nicknameController,
+                decoration: InputDecoration(labelText: 'Nickname'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your nickname';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: Text('Pick Image'),
+              ),
+              if (_image != null) Image.file(_image!),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

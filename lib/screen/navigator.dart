@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_meal/screen/meal/meal_screen.dart';
 import 'package:school_meal/screen/post/post_screen.dart';
-import 'package:school_meal/screen/profile/profile_screen.dart';
+import 'package:school_meal/screen/profile/edit_profile.dart';
 
 class MainNavigator extends StatefulWidget {
   const MainNavigator({super.key});
