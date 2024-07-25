@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:school_meal/screen/profile/edit_profile.dart';
 import 'package:school_meal/screen/profile/profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
