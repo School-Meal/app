@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:school_meal/screen/auth/signin_screen.dart';
+import 'package:school_meal/screen/navigator.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +18,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _loadingBarAnimation;
+  final _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -27,25 +33,73 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    Timer(const Duration(seconds: 2), () {
-      _controller.forward();
-    });
+    _controller.forward();
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        _checkLoginStatus(); // 토큰 유효성 확인 및 화면 전환
+      }
+    });
+  }
+
+  Future<void> _checkLoginStatus() async {
+    // 저장된 refresh token 확인
+    String? refreshToken = await _storage.read(key: 'refreshToken');
+
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      // refresh token으로 새로운 토큰 발급 시도
+      bool success = await _refreshAccessToken(refreshToken);
+
+      if (success) {
+        // 재발급 성공 시 MainNavigator로 이동
         Navigator.of(context).pushAndRemoveUntil(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                SignInScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return child;
-            },
-          ),
+          MaterialPageRoute(builder: (context) => const MainNavigator()),
+          (route) => false,
+        );
+      } else {
+        // 재발급 실패 시 로그인 화면으로 이동
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const SignInScreen()),
           (route) => false,
         );
       }
-    });
+    } else {
+      // refresh token이 없는 경우 로그인 화면으로 이동
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const SignInScreen()),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<bool> _refreshAccessToken(String refreshToken) async {
+    final url = Uri.parse('http://52.78.20.150/auth/refresh');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $refreshToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final newAccessToken = responseData['accessToken'];
+        final newRefreshToken = responseData['refreshToken'];
+
+        // 새로운 토큰 저장
+        await _storage.write(key: 'accessToken', value: newAccessToken);
+        await _storage.write(key: 'refreshToken', value: newRefreshToken);
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error refreshing token: $e');
+      return false;
+    }
   }
 
   @override
@@ -75,7 +129,6 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 5,
                   child: LinearProgressIndicator(
                     value: _loadingBarAnimation.value,
-                    borderRadius: BorderRadius.circular(100),
                     backgroundColor: Colors.white,
                     color: Colors.blue,
                   ),
