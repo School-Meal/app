@@ -15,8 +15,15 @@ class _SettingScreenState extends State<SettingScreen> {
         centerTitle: false,
         title: Text("설정"),
       ),
-      body: Center(
-        child: Text("설정"),
+      body: Column(
+        children: [
+          ListTile(
+            title: Text("로그아웃"),
+            onTap: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+        ],
       ),
     );
   }
