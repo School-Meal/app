@@ -11,7 +11,19 @@ class _MealScreenState extends State<MealScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      appBar: AppBar(
+        backgroundColor: Colors.blue.shade300,
+        automaticallyImplyLeading: false,
+        centerTitle: false,
+        title: const Text(
+          "학교급식",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: const Center(
         child: Text("급식화면"),
       ),
     );

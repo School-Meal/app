@@ -57,25 +57,26 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue.shade100,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               'assets/logo.png',
-              width: 100,
+              width: 120,
             ),
             const SizedBox(height: 15),
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return SizedBox(
-                  width: 180,
+                  width: 150,
                   height: 5,
                   child: LinearProgressIndicator(
                     value: _loadingBarAnimation.value,
                     borderRadius: BorderRadius.circular(100),
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor: Colors.white,
                     color: Colors.blue,
                   ),
                 );
