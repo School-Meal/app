@@ -40,44 +40,15 @@ class _EditProfileState extends State<EditProfile> {
       final path = await _getTokenPath();
       final file = File(path);
       String token = await file.readAsString();
-      print('Token read: $token'); // 토큰 읽기 로그 출력
       return token;
     } catch (e) {
-      print('Failed to read token: $e'); // 토큰 읽기 실패 로그 출력
-      return null;
-    }
-  }
-
-  Future<void> _writeToken(String token) async {
-    final path = await _getTokenPath();
-    final file = File(path);
-    await file.writeAsString(token);
-    print('Token written: $token'); // 토큰 쓰기 로그 출력
-  }
-
-  Future<String?> _refreshToken() async {
-    final url = Uri.parse('http://52.78.20.150/refresh');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final newToken = responseData['accessToken'];
-      await _writeToken(newToken);
-      print('Token refreshed: $newToken'); // 토큰 새로고침 로그 출력
-      return newToken;
-    } else {
-      print(
-          'Error refreshing token: ${response.statusCode}'); // 토큰 새로고침 실패 로그 출력
       return null;
     }
   }
 
   Future<void> _updateProfile() async {
     String? token = await _readToken();
-    if (token == null) {
-      print('No token available'); // 토큰 없음 로그 출력
-      return;
-    }
+    if (token == null) return;
 
     final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
     var request = http.MultipartRequest('PATCH', url)
@@ -93,27 +64,12 @@ class _EditProfileState extends State<EditProfile> {
     }
 
     final response = await request.send();
-
-    if (response.statusCode == 401) {
-      print('Token expired, refreshing token'); // 토큰 만료 로그 출력
-      String? newToken = await _refreshToken();
-      if (newToken != null) {
-        request.headers['Authorization'] = 'Bearer $newToken';
-        final retryResponse = await request.send();
-        if (retryResponse.statusCode == 200) {
-          final responseData = await retryResponse.stream.bytesToString();
-          final updatedProfile = json.decode(responseData);
-          Navigator.of(context).pop(updatedProfile);
-        } else {
-          print(
-              'Error updating profile after token refresh: ${retryResponse.statusCode}');
-        }
-      }
-    } else if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
       final responseData = await response.stream.bytesToString();
       final updatedProfile = json.decode(responseData);
       Navigator.of(context).pop(updatedProfile);
     } else {
+      // Handle error
       print('Error updating profile: ${response.statusCode}');
     }
   }
