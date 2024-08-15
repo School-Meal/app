@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,6 +15,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _schoolNameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
+
+  Future<void> _signUp() async {
+    final url = Uri.parse('http://52.78.20.150/auth/signup');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': _emailController.text,
+        'password': _passwordController.text,
+        'schoolName': _schoolNameController.text,
+        'nickName': _nicknameController.text,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // 회원가입 성공
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('회원가입이 완료되었습니다.')),
+      );
+      Navigator.pop(context); // 로그인 화면으로 돌아가기
+    } else {
+      // 회원가입 실패
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('회원가입에 실패했습니다. 다시 시도해주세요.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _buildTextField(_nicknameController, '닉네임', Icons.person),
                   const SizedBox(height: 30),
                   _buildButton("회원가입", () {
-                    // 회원가입 로직 (아직 구현하지 않음)
+                    _signUp();
                   }),
                   const SizedBox(height: 20),
                   TextButton(
