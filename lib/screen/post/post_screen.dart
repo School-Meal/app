@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:like_button/like_button.dart';
 import 'package:school_meal/screen/post/add/add_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:school_meal/screen/services/auth_service.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({super.key});
@@ -12,12 +14,18 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
+  final AuthService _authService = AuthService();
   List<Map<String, dynamic>> posts = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchPosts();
+    _fetchPostsAndLikeCounts();
+  }
+
+  Future<void> _fetchPostsAndLikeCounts() async {
+    await _fetchPosts();
+    await _fetchLikeCounts();
   }
 
   Future<void> _fetchPosts() async {
@@ -30,16 +38,15 @@ class _PostScreenState extends State<PostScreen> {
         setState(() {
           posts = postData.map((data) {
             return {
-              'id': data['id'], // 게시물 ID 추가
+              'id': data['id'],
               'title': data['title'],
               'content': data['content'],
               'imageUrl': data['imageUrl'],
-              'nickName': data['author']['nickName'], // 닉네임 추가
-              'schoolName': data['author']['schoolName'], // 학교 데이터 추가
+              'nickName': data['author']['nickName'],
+              'schoolName': data['author']['schoolName'],
               'createdAt': _formatDate(data['createdAt']),
             };
           }).toList();
-          // 역순으로 정렬
           posts = posts.reversed.toList();
         });
       } else {
@@ -47,6 +54,35 @@ class _PostScreenState extends State<PostScreen> {
       }
     } catch (e) {
       print('Error fetching posts: $e');
+    }
+  }
+
+  Future<void> _fetchLikeCounts() async {
+    String? accessToken = await _authService.getValidAccessToken();
+    if (accessToken == null) {
+      print('Access token is null');
+      return;
+    }
+
+    for (var post in posts) {
+      final postId = post['id'];
+      final url = Uri.parse('http://52.78.20.150/like/count/$postId');
+      try {
+        final response = await http.get(
+          url,
+          headers: {'Authorization': 'Bearer $accessToken'},
+        );
+
+        if (response.statusCode == 200) {
+          setState(() {
+            post['likeCount'] = int.parse(response.body);
+          });
+        } else {
+          print('Failed to load like count for post $postId');
+        }
+      } catch (e) {
+        print('Error fetching like count: $e');
+      }
     }
   }
 
@@ -68,11 +104,11 @@ class _PostScreenState extends State<PostScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          title: Text('게시물 삭제'),
-          content: Text('정말로 이 게시물을 삭제하시겠습니까?'),
+          title: const Text('게시물 삭제'),
+          content: const Text('정말로 이 게시물을 삭제하시겠습니까?'),
           actions: <Widget>[
             TextButton(
-              child: Text(
+              child: const Text(
                 '취소',
                 style: TextStyle(color: Colors.black),
               ),
@@ -81,7 +117,7 @@ class _PostScreenState extends State<PostScreen> {
               },
             ),
             TextButton(
-              child: Text(
+              child: const Text(
                 '삭제',
                 style: TextStyle(color: Colors.red),
               ),
@@ -142,6 +178,10 @@ class _PostScreenState extends State<PostScreen> {
                           horizontal: 16, vertical: 8),
                       child: Row(
                         children: [
+                          Text(
+                            post['id'].toString(),
+                          ),
+                          SizedBox(width: 10),
                           Container(
                             width: 50,
                             height: 50,
@@ -158,7 +198,7 @@ class _PostScreenState extends State<PostScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           PopupMenuButton<String>(
                             color: Colors.white,
                             icon: const Icon(Icons.more_vert),
@@ -196,18 +236,35 @@ class _PostScreenState extends State<PostScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              LikeButton(
+                                likeCount: post['likeCount'] ?? 0,
+                              ),
+                              SizedBox(width: 5),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.chat,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
                           Text(
                             post['title'],
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
                             post['content'],
-                            style: TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Text(

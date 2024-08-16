@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:school_meal/screen/meal/rank/rank_screen.dart';
 import 'package:school_meal/screen/services/auth_service.dart';
 
 class MealScreen extends StatefulWidget {
@@ -99,7 +100,10 @@ class _MealScreenState extends State<MealScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const RankScreen()));
+            },
             icon: Icon(
               Icons.emoji_events_rounded,
               size: 32,
