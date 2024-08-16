@@ -34,13 +34,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (response.statusCode == 201) {
       // 회원가입 성공
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('회원가입이 완료되었습니다.')),
+        const SnackBar(
+          backgroundColor: Colors.green,
+          content: Text('회원가입이 완료되었습니다.'),
+        ),
       );
       Navigator.pop(context); // 로그인 화면으로 돌아가기
     } else {
       // 회원가입 실패
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('회원가입에 실패했습니다. 다시 시도해주세요.')),
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('회원가입에 실패했습니다. 다시 시도해주세요.'),
+        ),
       );
     }
   }

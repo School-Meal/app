@@ -39,8 +39,8 @@ class _MainNavigatorState extends State<MainNavigator> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.post_add_rounded),
-            label: '게시물',
+            icon: Icon(Icons.chat),
+            label: '커뮤니티',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.food_bank),

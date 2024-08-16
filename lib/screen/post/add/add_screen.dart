@@ -29,9 +29,31 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 
   Future<void> _submitPost() async {
-    if (_titleController.text.isEmpty ||
-        _contentController.text.isEmpty ||
-        _image == null) {
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('이미지를 선택해주세요.'),
+        ),
+      );
+      return;
+    }
+    if (_titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('제목을 입력해주세요.'),
+        ),
+      );
+      return;
+    }
+    if (_contentController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('내용을 입력해주세요.'),
+        ),
+      );
       return;
     }
 
@@ -58,6 +80,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
         if (mounted) {
           Navigator.of(context).pop();
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('게시물이 추가되었습니다.'),
+          ),
+        );
       } else {
         _showErrorDialog('게시물 추가에 실패했습니다.');
       }

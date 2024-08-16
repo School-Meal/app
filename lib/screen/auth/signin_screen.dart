@@ -22,7 +22,13 @@ class _SignInScreenState extends State<SignInScreen> {
     final String password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      _showErrorDialog('이메일과 비밀번호를 입력해주세요.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('이메일과 비밀번호를 입력해주세요.'),
+        ),
+      );
+      // _showErrorDialog('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -50,6 +56,13 @@ class _SignInScreenState extends State<SignInScreen> {
         final savedRefreshToken = await _storage.read(key: 'refreshToken');
         print('Access Token: $savedAccessToken');
         print('Refresh Token: $savedRefreshToken');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('로그인이 완료되었습니다.'),
+          ),
+        );
 
         // MainNavigator로 이동
         Navigator.pushReplacement(
