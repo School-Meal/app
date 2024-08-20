@@ -17,11 +17,41 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   final AuthService _authService = AuthService();
   List<Map<String, dynamic>> posts = [];
+  int? currentUserId;
 
   @override
   void initState() {
     super.initState();
+    _fetchCurrentUserId(); // 현재 사용자 ID 가져오기
     _fetchPostsAndLikeCounts();
+  }
+
+  Future<void> _fetchCurrentUserId() async {
+    String? accessToken = await _authService.getValidAccessToken();
+
+    if (accessToken != null) {
+      final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
+      try {
+        final response = await http.get(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final profileData = json.decode(response.body);
+          setState(() {
+            currentUserId = profileData['id'];
+          });
+        } else {
+          print('Failed to load user data');
+        }
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
+    }
   }
 
   Future<void> _fetchPostsAndLikeCounts() async {
@@ -40,10 +70,12 @@ class _PostScreenState extends State<PostScreen> {
           posts = postData.map((data) {
             return {
               'id': data['id'],
+              'authorId': data['author']['id'], // 작성자 ID 추가
               'title': data['title'],
               'content': data['content'],
               'imageUrl': data['imageUrl'],
               'nickName': data['author']['nickName'],
+              'imageUri': data['author']['imageUri'],
               'schoolName': data['author']['schoolName'],
               'createdAt': _formatDate(data['createdAt']),
             };
@@ -87,16 +119,62 @@ class _PostScreenState extends State<PostScreen> {
     }
   }
 
+  void _editPost(Map<String, dynamic> post) {
+    print('Edit post: ${post['id']}');
+  }
+
+  Future<void> _deletePost(int postId) async {
+    String? accessToken = await _authService.getValidAccessToken();
+    if (accessToken == null) {
+      print('Access token is null');
+      return;
+    }
+
+    final url = Uri.parse('${dotenv.env['API_URL']}/post/$postId');
+    try {
+      final response = await http.delete(
+        url,
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          posts.removeWhere((post) => post['id'] == postId);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물이 삭제되었습니다.')),
+        );
+      } else if (response.statusCode == 401) {
+        // 서버에서 반환된 메시지를 디코딩하여 가져옴
+        final responseBody = json.decode(response.body);
+        final message = responseBody['message'] ?? '삭제 권한이 없습니다.';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(message),
+          ),
+        );
+      } else {
+        print('Failed to delete post');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물 삭제에 실패했습니다.')),
+        );
+      }
+    } catch (e) {
+      print('Error deleting post: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('오류가 발생했습니다.')),
+      );
+    }
+  }
+
   String _formatDate(String dateTime) {
     final DateTime date = DateTime.parse(dateTime);
     return DateFormat('yyyy년 MM월 dd일').format(date);
   }
 
-  void _editPost(Map<String, dynamic> post) {
-    print('Edit post: ${post['id']}');
-  }
-
-  void _deletePost(Map<String, dynamic> post) {
+  void _confirmDeletePost(Map<String, dynamic> post) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -123,14 +201,21 @@ class _PostScreenState extends State<PostScreen> {
                 style: TextStyle(color: Colors.red),
               ),
               onPressed: () {
-                // TODO: 실제 삭제 API 호출
-                print('Delete post: ${post['id']}');
                 Navigator.of(context).pop();
+                _deletePost(post['id']);
               },
             ),
           ],
         );
       },
+    );
+  }
+
+  void _reportPost(Map<String, dynamic> post) {
+    // 신고 처리 로직을 여기에 구현
+    print('Report post: ${post['id']}');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('신고가 접수되었습니다.')),
     );
   }
 
@@ -171,6 +256,9 @@ class _PostScreenState extends State<PostScreen> {
                 final post = posts[index];
                 final nickName =
                     post['nickName'].isNotEmpty ? post['nickName'] : "사용자";
+                final isCurrentUserPost =
+                    currentUserId != null && post['authorId'] == currentUserId;
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -190,6 +278,21 @@ class _PostScreenState extends State<PostScreen> {
                               color: Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(100),
                             ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: post['imageUri'] != null
+                                  ? Image.network(
+                                      post['imageUri'],
+                                      width: double.infinity,
+                                      height: 300,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Icon(
+                                      Icons.person,
+                                      size: 30,
+                                      color: Colors.grey,
+                                    ),
+                            ),
                           ),
                           const SizedBox(width: 10),
                           Text(
@@ -207,19 +310,28 @@ class _PostScreenState extends State<PostScreen> {
                               if (result == 'edit') {
                                 _editPost(post);
                               } else if (result == 'delete') {
-                                _deletePost(post);
+                                _confirmDeletePost(post);
+                              } else if (result == 'report') {
+                                _reportPost(post);
                               }
                             },
                             itemBuilder: (BuildContext context) =>
                                 <PopupMenuEntry<String>>[
-                              const PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Text('수정'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Text('삭제'),
-                              ),
+                              if (isCurrentUserPost) ...[
+                                const PopupMenuItem<String>(
+                                  value: 'edit',
+                                  child: Text('수정'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Text('삭제'),
+                                ),
+                              ] else ...[
+                                const PopupMenuItem<String>(
+                                  value: 'report',
+                                  child: Text('신고'),
+                                ),
+                              ],
                             ],
                           ),
                         ],
@@ -242,7 +354,7 @@ class _PostScreenState extends State<PostScreen> {
                               LikeButton(
                                 likeCount: post['likeCount'] ?? 0,
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               LikeButton(
                                 likeCount: 1,
                                 likeBuilder: (isTapped) {
@@ -255,7 +367,7 @@ class _PostScreenState extends State<PostScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text(
                             post['title'],
                             style: const TextStyle(
@@ -291,8 +403,12 @@ class _PostScreenState extends State<PostScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddPostScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddPostScreen(),
+            ),
+          );
         },
         child: const Icon(
           Icons.edit_document,
