@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:school_meal/screen/profile/edit/edit_screen.dart';
 import 'package:school_meal/screen/profile/setting/setting_screen.dart';
 import 'package:school_meal/screen/services/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -60,9 +61,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // 이미지 선택 기능 (추가 기능 구현 가능)
-  void _pickImage() {
-    // 이미지 선택 기능 구현
-    print("이미지 수정 버튼 클릭됨");
+  // ProfileScreen.dart 내의 _pickImage 메서드 수정
+  void _editProfile() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProfileEditScreen(
+          initialNickName: nickName,
+          initialSchoolName: schoolName,
+          initialEmail: email,
+          initialImageUri: imageUri,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      // 프로필이 수정되었다면 프로필 정보를 다시 불러옵니다.
+      _fetchProfile();
+    }
   }
 
   @override
@@ -95,53 +110,93 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey.shade300,
-                  backgroundImage: imageUri != null
-                      ? NetworkImage(imageUri!)
-                      : null, // 이미지 URI가 null이 아니면 표시
-                  child: imageUri == null
-                      ? Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.white,
-                        )
-                      : null, // 이미지 URI가 null이면 기본 아이콘 표시
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.edit,
-                        size: 20,
-                        color: Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage:
+                          imageUri != null ? NetworkImage(imageUri!) : null,
+                      child: imageUri == null
+                          ? Icon(Icons.person,
+                              size: 60, color: Colors.grey[400])
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _editProfile,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[400],
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.edit,
+                              size: 20, color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text("학교 이름: $schoolName"),
-            Text("이메일: $email"),
-            Text("닉네임: $nickName"),
-          ],
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: Text(
+                  nickName,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  schoolName,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(height: 40),
+              _buildInfoItem(Icons.school, "학교", schoolName),
+              const Divider(height: 32),
+              _buildInfoItem(Icons.email, "이메일", email),
+              const Divider(height: 32),
+              _buildInfoItem(Icons.person, "닉네임", nickName),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoItem(IconData icon, String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: Colors.blue[400]),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                content,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
