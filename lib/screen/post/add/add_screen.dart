@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -59,7 +60,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     String? accessToken = await _authService.getValidAccessToken();
 
-    final url = Uri.parse('http://52.78.20.150/post');
+    final url = Uri.parse('${dotenv.env['API_URL']}/post');
     var request = http.MultipartRequest('POST', url);
 
     request.headers['Authorization'] = 'Bearer $accessToken';

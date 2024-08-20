@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:school_meal/screen/auth/signup_screen.dart';
@@ -32,7 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    final url = Uri.parse('http://52.78.20.150/auth/signin');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/signin');
 
     try {
       final response = await http.post(

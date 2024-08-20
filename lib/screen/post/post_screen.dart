@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:like_button/like_button.dart';
 import 'package:school_meal/screen/post/add/add_screen.dart';
@@ -29,7 +30,7 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Future<void> _fetchPosts() async {
-    final url = Uri.parse('http://52.78.20.150/post');
+    final url = Uri.parse('${dotenv.env['API_URL']}/post');
     try {
       final response = await http.get(url);
 
@@ -66,7 +67,7 @@ class _PostScreenState extends State<PostScreen> {
 
     for (var post in posts) {
       final postId = post['id'];
-      final url = Uri.parse('http://52.78.20.150/like/count/$postId');
+      final url = Uri.parse('${dotenv.env['API_URL']}/like/count/$postId');
       try {
         final response = await http.get(
           url,
@@ -241,14 +242,16 @@ class _PostScreenState extends State<PostScreen> {
                               LikeButton(
                                 likeCount: post['likeCount'] ?? 0,
                               ),
-                              SizedBox(width: 5),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.chat,
-                                  size: 30,
-                                  color: Colors.grey,
-                                ),
+                              SizedBox(width: 10),
+                              LikeButton(
+                                likeCount: 1,
+                                likeBuilder: (isTapped) {
+                                  return Icon(
+                                    Icons.chat,
+                                    color: isTapped ? Colors.blue : Colors.grey,
+                                    size: 30,
+                                  );
+                                },
                               ),
                             ],
                           ),

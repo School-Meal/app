@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:school_meal/screen/profile/setting/setting_screen.dart';
 import 'package:school_meal/screen/services/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String? accessToken = await _authService.getValidAccessToken();
 
     if (accessToken != null) {
-      final url = Uri.parse('http://52.78.20.150/auth/me');
+      final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
       try {
         final response = await http.get(
           url,

@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
   final _storage = const FlutterSecureStorage();
-  final _refreshUrl = Uri.parse('http://52.78.20.150/auth/refresh');
+  final _refreshUrl = Uri.parse('${dotenv.env['API_URL']}/auth/refresh');
 
   // 토큰이 만료되었는지 확인하는 함수
   bool _isTokenExpired(String token) {

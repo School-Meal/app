@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -73,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<bool> _refreshAccessToken(String refreshToken) async {
-    final url = Uri.parse('http://52.78.20.150/auth/refresh');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/refresh');
     try {
       final response = await http.get(
         url,
@@ -128,6 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
                   width: 150,
                   height: 5,
                   child: LinearProgressIndicator(
+                    borderRadius: BorderRadius.circular(100),
                     value: _loadingBarAnimation.value,
                     backgroundColor: Colors.white,
                     color: Colors.blue,
