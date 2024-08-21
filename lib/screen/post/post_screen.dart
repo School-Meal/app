@@ -453,7 +453,11 @@ class _PostScreenState extends State<PostScreen> {
             MaterialPageRoute(
               builder: (context) => const AddPostScreen(),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              _fetchPostsAndLikeCounts(); // 게시물 생성 후 새로고침
+            }
+          });
         },
         child: const Icon(
           Icons.edit_document,

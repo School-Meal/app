@@ -79,7 +79,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       final response = await request.send();
       if (response.statusCode == 201) {
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.pop(context, true);
         }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

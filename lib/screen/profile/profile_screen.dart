@@ -110,66 +110,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage:
-                          imageUri != null ? NetworkImage(imageUri!) : null,
-                      child: imageUri == null
-                          ? Icon(Icons.person,
-                              size: 60, color: Colors.grey[400])
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _editProfile,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[400],
-                            shape: BoxShape.circle,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage:
+                            imageUri != null ? NetworkImage(imageUri!) : null,
+                        child: imageUri == null
+                            ? Icon(Icons.person,
+                                size: 60, color: Colors.grey[400])
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _editProfile,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[400],
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit,
+                                size: 20, color: Colors.white),
                           ),
-                          child: const Icon(Icons.edit,
-                              size: 20, color: Colors.white),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: Text(
-                  nickName,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                const SizedBox(height: 24),
+                Center(
+                  child: Text(
+                    nickName,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  schoolName,
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    schoolName,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 42),
-              _buildInfoItem(Icons.person, "닉네임", nickName),
-              const Divider(height: 32),
-              _buildInfoItem(Icons.school, "학교", schoolName),
-              const Divider(height: 32),
-              _buildInfoItem(Icons.email, "이메일", email),
-              const Divider(height: 32),
-            ],
+                const SizedBox(height: 42),
+                _buildInfoItem(Icons.person, "닉네임", nickName),
+                const Divider(height: 32),
+                _buildInfoItem(Icons.school, "학교", schoolName),
+                const Divider(height: 32),
+                _buildInfoItem(Icons.email, "이메일", email),
+                const Divider(height: 32),
+              ],
+            ),
           ),
         ),
       ),

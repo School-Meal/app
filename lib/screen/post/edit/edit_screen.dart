@@ -72,6 +72,12 @@ class _EditPostScreenState extends State<EditPostScreen> {
     try {
       final response = await request.send();
       if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('게시물이 수정되었습니다!'),
+          ),
+        );
         Navigator.pop(context, true);
       } else {
         _showErrorDialog('게시물 수정에 실패했습니다.');
