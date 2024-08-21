@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:like_button/like_button.dart';
 import 'package:school_meal/screen/post/add/add_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:school_meal/screen/post/edit/edit_screen.dart';
 import 'package:school_meal/screen/services/auth_service.dart';
 
 class PostScreen extends StatefulWidget {
@@ -119,8 +120,23 @@ class _PostScreenState extends State<PostScreen> {
     }
   }
 
-  void _editPost(Map<String, dynamic> post) {
-    print('Edit post: ${post['id']}');
+  void _editPost(Map<String, dynamic> post) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditPostScreen(
+          postId: post['id'],
+          initialTitle: post['title'],
+          initialContent: post['content'],
+          initialImageUrl: post['imageUrl'],
+        ),
+      ),
+    );
+
+    // result가 true인 경우에만 새로고침
+    if (result == true) {
+      _fetchPostsAndLikeCounts();
+    }
   }
 
   Future<void> _deletePost(int postId) async {
@@ -256,6 +272,8 @@ class _PostScreenState extends State<PostScreen> {
                 final post = posts[index];
                 final nickName =
                     post['nickName'].isNotEmpty ? post['nickName'] : "사용자";
+                final isDefaultUser = nickName == "사용자";
+
                 final isCurrentUserPost =
                     currentUserId != null && post['authorId'] == currentUserId;
 
@@ -264,13 +282,10 @@ class _PostScreenState extends State<PostScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 10, vertical: 8),
                       child: Row(
                         children: [
-                          Text(
-                            post['id'].toString(),
-                          ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Container(
                             width: 50,
                             height: 50,
@@ -280,18 +295,24 @@ class _PostScreenState extends State<PostScreen> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(100),
-                              child: post['imageUri'] != null
-                                  ? Image.network(
-                                      post['imageUri'],
-                                      width: double.infinity,
-                                      height: 300,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : const Icon(
+                              child: isDefaultUser
+                                  ? const Icon(
                                       Icons.person,
                                       size: 30,
                                       color: Colors.grey,
-                                    ),
+                                    )
+                                  : (post['imageUri'] != null
+                                      ? Image.network(
+                                          post['imageUri'],
+                                          width: double.infinity,
+                                          height: 300,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Icon(
+                                          Icons.person,
+                                          size: 30,
+                                          color: Colors.grey,
+                                        )),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -318,18 +339,42 @@ class _PostScreenState extends State<PostScreen> {
                             itemBuilder: (BuildContext context) =>
                                 <PopupMenuEntry<String>>[
                               if (isCurrentUserPost) ...[
-                                const PopupMenuItem<String>(
+                                PopupMenuItem<String>(
                                   value: 'edit',
-                                  child: Text('수정'),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/edit.png',
+                                        width: 25,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      const Text('수정'),
+                                    ],
+                                  ),
                                 ),
                                 const PopupMenuItem<String>(
                                   value: 'delete',
-                                  child: Text('삭제'),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete),
+                                      SizedBox(width: 5),
+                                      Text('삭제'),
+                                    ],
+                                  ),
                                 ),
                               ] else ...[
-                                const PopupMenuItem<String>(
+                                PopupMenuItem<String>(
                                   value: 'report',
-                                  child: Text('신고'),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/report.png',
+                                        width: 30,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      const Text('신고'),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ],

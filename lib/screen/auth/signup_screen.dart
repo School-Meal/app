@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nicknameController = TextEditingController();
 
   Future<void> _signUp() async {
-    final url = Uri.parse('http://52.78.20.150/auth/signup');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/signup');
     final response = await http.post(
       url,
       headers: <String, String>{

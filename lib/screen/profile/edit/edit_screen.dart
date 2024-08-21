@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:school_meal/screen/services/auth_service.dart';
@@ -57,7 +58,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       return;
     }
 
-    final url = Uri.parse('http://52.78.20.150/auth/me');
+    final url = Uri.parse('${dotenv.env['API_URL']}/auth/me');
     var request = http.MultipartRequest('PATCH', url);
 
     request.headers['Authorization'] = 'Bearer $accessToken';

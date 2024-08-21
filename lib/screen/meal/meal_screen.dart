@@ -115,9 +115,16 @@ class _MealScreenState extends State<MealScreen> {
       ),
       body: meals.isEmpty
           ? const Center(
-              child: Text(
-                "오늘 급식은 없습니다.",
-                style: TextStyle(fontSize: 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.food_bank, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "오늘 급식은 없습니다.",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
               ),
             )
           : PageView.builder(
