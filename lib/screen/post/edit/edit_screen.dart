@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -54,7 +55,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
       return;
     }
 
-    final url = Uri.parse('http://3.34.76.135/post/${widget.postId}');
+    final url = Uri.parse('${dotenv.env['API_URL']}/post/${widget.postId}');
     var request = http.MultipartRequest('PATCH', url);
 
     request.headers['Authorization'] = 'Bearer $accessToken';
