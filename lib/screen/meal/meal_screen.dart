@@ -162,8 +162,8 @@ class _MealScreenState extends State<MealScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Container(
-                          height: 400,
+                        Expanded(
+                          // Expanded 위젯을 사용하여 남은 공간을 사용하도록 합니다.
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -179,6 +179,7 @@ class _MealScreenState extends State<MealScreen> {
                               ),
                               const SizedBox(height: 5),
                               Expanded(
+                                // 이곳에도 Expanded를 사용하여 스크롤 가능하도록 합니다.
                                 child: ListView.builder(
                                   itemCount: menu.length,
                                   itemBuilder: (context, index) {
