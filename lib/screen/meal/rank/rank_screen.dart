@@ -187,7 +187,7 @@ class _RankScreenState extends State<RankScreen> {
         ),
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
               color: Colors.blue,
             ))
