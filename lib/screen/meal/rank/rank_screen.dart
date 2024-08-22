@@ -6,7 +6,7 @@ import 'package:school_meal/screen/services/auth_service.dart';
 import 'package:intl/intl.dart';
 
 class RankScreen extends StatefulWidget {
-  const RankScreen({Key? key}) : super(key: key);
+  const RankScreen({super.key});
 
   @override
   State<RankScreen> createState() => _RankScreenState();
@@ -103,7 +103,7 @@ class _RankScreenState extends State<RankScreen> {
         : (rank == 2 ? Colors.grey.shade400 : Colors.brown.shade200);
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -112,12 +112,12 @@ class _RankScreenState extends State<RankScreen> {
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 4,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
           width: 60,
           height: 60,
@@ -141,13 +141,13 @@ class _RankScreenState extends State<RankScreen> {
         ),
         title: Text(
           post['title'],
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
           '${post['author']['nickName']} • ${_formatDate(post['createdAt'])}',
-          style: TextStyle(fontSize: 12),
+          style: const TextStyle(fontSize: 12),
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +155,7 @@ class _RankScreenState extends State<RankScreen> {
           children: [
             Text(
               '❤️ ${post['likeCount']}',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
