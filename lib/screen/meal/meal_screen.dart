@@ -15,6 +15,7 @@ class MealScreen extends StatefulWidget {
 class _MealScreenState extends State<MealScreen> {
   final AuthService _authService = AuthService();
   List<Map<String, dynamic>> meals = [];
+  PageController? _pageController;
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _MealScreenState extends State<MealScreen> {
           if (mealData['meals'] != null) {
             setState(() {
               meals = List<Map<String, dynamic>>.from(mealData['meals']);
+              _initializePageController();
             });
           } else {
             if (mounted) {
@@ -70,6 +72,34 @@ class _MealScreenState extends State<MealScreen> {
         });
       }
     }
+  }
+
+  void _initializePageController() {
+    final currentHour = DateTime.now().hour;
+
+    int initialPage = 0;
+
+    if (currentHour >= 5 && currentHour < 10) {
+      // 아침 시간: 5시 ~ 10시
+      initialPage = _findMealPage('조식');
+    } else if (currentHour >= 10 && currentHour < 14) {
+      // 점심 시간: 10시 ~ 14시
+      initialPage = _findMealPage('중식');
+    } else if (currentHour >= 14 && currentHour < 20) {
+      // 저녁 시간: 14시 ~ 20시
+      initialPage = _findMealPage('석식');
+    }
+
+    _pageController = PageController(initialPage: initialPage);
+  }
+
+  int _findMealPage(String mealType) {
+    for (int i = 0; i < meals.length; i++) {
+      if (meals[i]['type'] == mealType) {
+        return i;
+      }
+    }
+    return 0; // 기본적으로 첫 페이지
   }
 
   String _getMealImage(String mealType) {
@@ -128,6 +158,7 @@ class _MealScreenState extends State<MealScreen> {
               ),
             )
           : PageView.builder(
+              controller: _pageController,
               itemCount: meals.length,
               itemBuilder: (context, index) {
                 final meal = meals[index];
