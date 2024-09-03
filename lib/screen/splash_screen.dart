@@ -58,7 +58,6 @@ class _SplashScreenState extends State<SplashScreen>
           (route) => false,
         );
       } else {
-        // 재발급 실패 시 로그인 화면으로 이동
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const SignInScreen()),
           (route) => false,
